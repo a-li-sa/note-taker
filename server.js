@@ -8,7 +8,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 // Routes
 // =============================================================
-// * GET `*` - Should return the `index.html` file
 app.get("/", function(req, res) {
   res.sendFile(path.join(__dirname, "public","index.html"));
 });
@@ -16,6 +15,8 @@ app.get("/", function(req, res) {
 app.get("/notes", function(req, res) {
   res.sendFile(path.join(__dirname, "public","notes.html"));
 });
+// API Routes
+// =============================================================
 app.route('/api/notes')
   //   * GET `/api/notes` - Should read the `db.json` file and return all saved notes as JSON.
   .get((req, res) => {
@@ -27,7 +28,7 @@ app.route('/api/notes')
     const newNote = req.body;
     const db = fs.readFileSync('db/db.json');
     const notes = JSON.parse(db);
-    req.body.id = notes.length;
+    req.body.id = notes.length + 1;
     notes.push(newNote);
     const updatedNotes = fs.writeFileSync('db/db.json', JSON.stringify(notes));
     return res.send(updatedNotes);
@@ -38,11 +39,11 @@ app.delete('/api/notes/:id', (req, res) => {
     let notes = JSON.parse(db);
     const id = req.params.id;
     for (let i = 0; i < notes.length; i++) {
-      if (parseInt(id) === i) {
+      if (parseInt(id) === i + 1) {
         notes.splice(i, 1);
         let splicedNotes = notes;
         for (let i = 0; i < splicedNotes.length; i++) {
-          splicedNotes[i].id = i;
+          splicedNotes[i].id = i + 1;
         }
         notes = splicedNotes;
         const updatedNotes = fs.writeFileSync('db/db.json', JSON.stringify(notes));
